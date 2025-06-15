@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Appium Q&A - Session Notes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #eee;
+      padding: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    h1 {
+      color: #00df9a;
+    }
+    .qa {
+      background-color: #222;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .question {
+      font-weight: bold;
+      color: #ffd369;
+      margin-bottom: 10px;
+    }
+    .answer {
+      white-space: pre-wrap;
+    }
+    code {
+      background-color: #333;
+      padding: 2px 4px;
+      border-radius: 4px;
+      color: #0ff;
+    }
+    pre {
+      background-color: #1e1e1e;
+      padding: 10px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Appium Q&A - Session Notes</h1>
+
+  <div class="qa">
+    <div class="question">❓ How do I find the package and activity name in Appium using Java?</div>
+    <div class="answer">
+Use ADB:
+<pre>adb shell dumpsys activity activities | findstr "ResumedActivity"</pre>
+Example output:
+<code>com.example.app/.MainActivity</code>
+
+Use in Appium:
+<pre>
+caps.setCapability("appPackage", "com.example.app");
+caps.setCapability("appActivity", "com.example.app.MainActivity");
+</pre>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="question">❓ Getting `'grep' is not recognized` error?</div>
+    <div class="answer">
+You're on Windows. Use <code>findstr</code> instead of <code>grep</code>:
+
+<pre>adb shell dumpsys activity activities | findstr "ResumedActivity"</pre>
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="question">❓ My output shows: com.vyom.okasmax/.boarding.OABoardingActivity — is this correct?</div>
+    <div class="answer">
+Yes, that's the current resumed activity. But if Appium can't start it directly, it may not be a launcher activity.
+    </div>
+  </div>
+
+  <div class="qa">
+    <div class="question">❓  org.openqa.selenium.SessionNotCreatedException: Could not start a new session. Response code 500. Message: An unknown server-side error occurred while processing the command. Original error: Cannot start the 'com.vyom.okasmax' application. Consider checking the driver's troubleshooting documentation. Original error: Error executing adbExec. Original error</div>
+    <div class="answer">
+The activity <code>.boarding.OABoardingActivity</code> can't be launched directly.
+
+➡️ Use the actual launcher activity instead.
+
+Run:
+<pre>adb shell dumpsys package com.vyom.okasmax | findstr Activity</pre>
+
+Found:
+<code>.SplashActivity</code>
+
+Example
+<code>C:\Users\sachi>adb shell dumpsys package com.vyom.okasmax | findstr "Activity"
+Activity Resolver Table:
+        7069d1c com.vyom.okasmax/.SplashActivity filter 1579d25</code>
+Use:
+<pre>
+caps.setCapability("appPackage", "com.vyom.okasmax");
+caps.setCapability("appActivity", ".SplashActivity");
+caps.setCapability("appWaitActivity", "*");
+</pre>
+    </div>
+  </div>
+
+</body>
+</html>
